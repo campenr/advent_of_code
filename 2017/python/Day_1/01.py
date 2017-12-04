@@ -35,6 +35,23 @@ the fourth digit.
 91212129 produces 9 because the only digit that matches the next one is the last digit, 9.
 What is the solution to your captcha?
 
+--- Part Two ---
+
+You notice a progress bar that jumps to 50% completion. Apparently, the door isn't yet satisfied, but it did emit a star
+as encouragement. The instructions change:
+
+Now, instead of considering the next digit, it wants you to consider the digit halfway around the circular list. That
+is, if your list contains 10 items, only include a digit in your sum if the digit 10/2 = 5 steps forward matches it.
+Fortunately, your list has an even number of elements.
+
+For example:
+
+1212 produces 6: the list contains 4 items, and all four digits match the digit 2 items ahead.
+1221 produces 0, because every comparison is between a 1 and a 2.
+123425 produces 4, because both 2s match each other, but no other digit has a match.
+123123 produces 12.
+12131415 produces 4.
+
 """
 
 input_captcha = '111831362354551173134957758417849716877188716338227121869992652972154651632296676464285261171625892' \
@@ -61,36 +78,49 @@ input_captcha = '111831362354551173134957758417849716877188716338227121869992652
                 '984366515428245928111112613638341345371'
 
 
-def inverse_captcha(captcha):
+def inverse_captcha(captcha, offset=1):
     """Calculates captcha solution."""
 
-    # to emulate looped input, append first digit to end
-    captcha += captcha[0]
-
     # init variables
-    last_num = None
     current_num = None
+    match_num = None
     sum_ = 0
 
-    for char in captcha:
+    for i in range(len(captcha)):
+        current_num = int(captcha[i])
 
-        current_num = int(char)
-        if last_num is not None:
-            # compare current and last nums from second captcha character onwards
-            if last_num == current_num:
-                sum_ += current_num
+        # calculate index of number to match with, wrapping aroung list as necessary
+        match_idx = i + offset
+        if len(captcha) <= match_idx:
+            match_idx = match_idx % len(captcha)
+        match_num = int(captcha[match_idx])
 
-        # set last_num for next iteration
-        last_num = current_num
+        # conditionally increment sum
+        if current_num == match_num:
+            sum_ += current_num
 
     return sum_
 
 
 if __name__ == '__main__':
-    assert inverse_captcha('1122') == 3
-    assert inverse_captcha('1111') == 4
-    assert inverse_captcha('1234') == 0
-    assert inverse_captcha('91212129') == 9
+
+    # ------ Part 1 ------ #
+
+    assert inverse_captcha('1122', 1) == 3
+    assert inverse_captcha('1111', 1) == 4
+    assert inverse_captcha('1234', 1) == 0
+    assert inverse_captcha('91212129', 1) == 9
 
     # display my answer
-    print('my answer: ', inverse_captcha(input_captcha))
+    print('Part 1: ', inverse_captcha(input_captcha))
+
+    # ------ Part 2 ------ #
+
+    assert inverse_captcha('1212', 2) == 6
+    assert inverse_captcha('1221', 2) == 0
+    assert inverse_captcha('123425', 3) == 4
+    assert inverse_captcha('123123', 3) == 12
+    assert inverse_captcha('12131415', 4) == 4
+
+    # display my answer
+    print('Part 2: ', inverse_captcha(input_captcha, len(input_captcha) // 2))

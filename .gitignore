@@ -1,0 +1,13 @@
+# Project dev files
+.idea/
+
+# build files
+build/
+dist/
+*egg*
+
+# virtual environment files
+venv/
+
+# pycache files
+__pycache__/

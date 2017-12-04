@@ -24,6 +24,31 @@ In this example, the spreadsheet's checksum would be 8 + 4 + 6 = 18.
 
 What is the checksum for the spreadsheet in your puzzle input?
 
+--- Part Two ---
+
+"Great work; looks like we're on the right track after all. Here's a star for your effort." However, the program seems
+a little worried. Can programs be worried?
+
+"Based on what we're seeing, it looks like all the User wanted is some information about the evenly divisible values in
+the spreadsheet. Unfortunately, none of us are equipped for that kind of calculation - most of us specialize in bitwise
+operations."
+
+It sounds like the goal is to find the only two numbers in each row where one evenly divides the other - that is, where
+the result of the division operation is a whole number. They would like you to find those numbers on each line, divide
+them, and add up each line's result.
+
+For example, given the following spreadsheet:
+
+5 9 2 8
+9 4 7 3
+3 8 6 5
+In the first row, the only two numbers that evenly divide are 8 and 2; the result of this division is 4.
+In the second row, the two numbers are 9 and 3; the result is 3.
+In the third row, the result is 2.
+In this example, the sum of the results would be 4 + 3 + 2 = 9.
+
+What is the sum of each row's result in your puzzle input?
+
 """
 
 import pandas as pd
@@ -31,19 +56,49 @@ import numpy as np
 
 
 checksum_input = '02_input.tsv'
-test_input = '02_test_input.tsv'
+test_input_1 = '02_test_input_1.tsv'
+test_input_2 = '02_test_input_2.tsv'
 
 
-def calculate_checksum(data):
+def calculate_checksum_1(data):
 
     df = pd.read_csv(data, sep='\t', header=None)
-    sums = df.apply(lambda x: x.max() - x.min(), axis=1).astype(np.int)
+    nums = df.apply(lambda x: x.max() - x.min(), axis=1).astype(np.int)
 
-    return sums.sum()
+    return nums.sum()
+
+
+def calculate_checksum_2(data):
+
+    df = pd.read_csv(data, sep='\t', header=None)
+    nums = df.apply(lambda x: find_nums(x), axis=1)
+
+    return sum(nums)
+
+
+def find_nums(row):
+
+    sorted_row = row.sort_values().tolist()
+    for i, val_1 in enumerate(sorted_row):
+        for j, val_2 in enumerate(sorted_row[i + 1:]):
+            if val_2 % val_1 == 0:
+                num = val_2 // val_1
+
+    return num
 
 
 if __name__ == '__main__':
-    assert calculate_checksum(test_input) == 18
+
+    # ------ Part 1 ------ #
+
+    assert calculate_checksum_1(test_input_1) == 18
 
     # display my solution
-    print('My Checksum: ', calculate_checksum(checksum_input))
+    print('Part 1: ', calculate_checksum_1(checksum_input))
+
+    # ------ Part 2 ------ #
+
+    assert calculate_checksum_2(test_input_2) == 9
+
+    # display my solution
+    print('Part 2: ', calculate_checksum_2(checksum_input))
